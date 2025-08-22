@@ -1,1 +1,153 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/**
+ * @title Aadhaar-Based Voting (Demo)
+ * @notice Demo-only contract for a college mini project.
+ *         DO NOT store plaintext Aadhaar. Use keccak256(aadhaarString) off-chain and pass the hash here.
+ *         Admin (owner) registers voters by their Aadhaar hash and controls phases.
+ *
+ *         Flow:
+ *         1) Owner deploys with initial candidate names
+ *         2) Owner opens registration -> bulkRegister voter hashes
+ *         3) Owner closes registration, opens voting
+ *         4) Voters call castVote(candidateIndex, aadhaarHash)
+ *         5) Anyone can read results; winner() after voting is closed
+ */
+contract AadhaarVoting {
+    // --- Ownership (minimal Ownable) ---
+    address public owner;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    // --- State ---
+    struct Candidate {
+        string name;
+        uint256 voteCount;
+    }
+
+    Candidate[] private _candidates;
+
+    // Registration/voting phases
+    bool public registrationOpen;
+    bool public votingOpen;
+
+    // Aadhaar hash => registered / voted
+    mapping(bytes32 => bool) public isRegistered;
+    mapping(bytes32 => bool) public hasVoted;
+
+    // --- Events ---
+    event CandidateAdded(uint256 indexed index, string name);
+    event VoterRegistered(bytes32 indexed aadhaarHash);
+    event VoteCast(bytes32 indexed aadhaarHash, uint256 indexed candidateIndex);
+    event PhaseChanged(string indexed phase, bool open);
+
+    // --- Constructor ---
+    constructor(string[] memory initialCandidates) {
+        owner = msg.sender;
+        for (uint256 i = 0; i < initialCandidates.length; i++) {
+            _candidates.push(Candidate({name: initialCandidates[i], voteCount: 0}));
+            emit CandidateAdded(i, initialCandidates[i]);
+        }
+    }
+
+    // --- Admin controls ---
+    function setRegistration(bool open) external onlyOwner {
+        registrationOpen = open;
+        emit PhaseChanged("registration", open);
+    }
+
+    function setVoting(bool open) external onlyOwner {
+        // Optional safety: prevent opening voting if no candidates
+        require(_candidates.length > 0, "No candidates");
+        votingOpen = open;
+        emit PhaseChanged("voting", open);
+    }
+
+    function addCandidates(string[] calldata names) external onlyOwner {
+        require(!votingOpen, "Cannot add during voting");
+        for (uint256 i = 0; i < names.length; i++) {
+            _candidates.push(Candidate({name: names[i], voteCount: 0}));
+            emit CandidateAdded(_candidates.length - 1, names[i]);
+        }
+    }
+
+    // --- Voter registration (admin-managed) ---
+    function registerVoter(bytes32 aadhaarHash) external onlyOwner {
+        require(registrationOpen, "Registration closed");
+        require(aadhaarHash != bytes32(0), "Invalid hash");
+        require(!isRegistered[aadhaarHash], "Already registered");
+        isRegistered[aadhaarHash] = true;
+        emit VoterRegistered(aadhaarHash);
+    }
+
+    function bulkRegister(bytes32[] calldata aadhaarHashes) external onlyOwner {
+        require(registrationOpen, "Registration closed");
+        for (uint256 i = 0; i < aadhaarHashes.length; i++) {
+            bytes32 h = aadhaarHashes[i];
+            if (h != bytes32(0) && !isRegistered[h]) {
+                isRegistered[h] = true;
+                emit VoterRegistered(h);
+            }
+        }
+    }
+
+    // --- Voting ---
+    function castVote(uint256 candidateIndex, bytes32 aadhaarHash) external {
+        require(votingOpen, "Voting closed");
+        require(candidateIndex < _candidates.length, "Bad candidate");
+        require(isRegistered[aadhaarHash], "Not registered");
+        require(!hasVoted[aadhaarHash], "Already voted");
+
+        hasVoted[aadhaarHash] = true;
+        _candidates[candidateIndex].voteCount += 1;
+
+        emit VoteCast(aadhaarHash, candidateIndex);
+    }
+
+    // --- Views / Results ---
+    function totalCandidates() external view returns (uint256) {
+        return _candidates.length;
+    }
+
+    function candidates(uint256 index) external view returns (string memory name, uint256 voteCount) {
+        require(index < _candidates.length, "Out of bounds");
+        Candidate memory c = _candidates[index];
+        return (c.name, c.voteCount);
+    }
+
+    function getAllCandidates()
+        external
+        view
+        returns (string[] memory names, uint256[] memory voteCounts)
+    {
+        uint256 n = _candidates.length;
+        names = new string[](n);
+        voteCounts = new uint256[](n);
+        for (uint256 i = 0; i < n; i++) {
+            names[i] = _candidates[i].name;
+            voteCounts[i] = _candidates[i].voteCount;
+        }
+    }
+
+    function winner()
+        external
+        view
+        returns (uint256 index, string memory name, uint256 voteCount)
+    {
+        require(!votingOpen, "Close voting first");
+        require(_candidates.length > 0, "No candidates");
+        uint256 best = 0;
+        for (uint256 i = 1; i < _candidates.length; i++) {
+            if (_candidates[i].voteCount > _candidates[best].voteCount) {
+                best = i;
+            }
+        }
+        Candidate memory c = _candidates[best];
+        return (best, c.name, c.voteCount);
+    }
+}
 
