@@ -1,0 +1,39 @@
+# Aadhaar-Based Voting (Demo Mini Project)
+
+> ⚠️ **Educational demo only.** Never store or transmit raw Aadhaar numbers on-chain.
+> Hash Aadhaar *off-chain* using `keccak256(utf8(aadhaarString))` and pass only the hash (bytes32) to the contract.
+
+## Features
+- Admin-managed phases: **registration** and **voting**
+- Voter registration by **Aadhaar hash** (`bytes32`)
+- One-person-one-vote enforced by Aadhaar-hash
+- Add candidates, cast vote, view results, compute winner after closing voting
+- Clean, small, Solidity ^0.8.20
+
+## Contract
+- File: `contracts/AadhaarVoting.sol`
+- ABI: `artifacts/AadhaarVoting.abi.json`
+
+## Tech Stack
+- Node.js (LTS), Hardhat, Ethers
+- Solidity ^0.8.20
+
+## Quickstart
+
+```bash
+# 1) Initialize project
+mkdir aadhaar-voting && cd aadhaar-voting
+npm init -y
+npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
+
+# 2) Create hardhat project
+npx hardhat
+# Choose "Create a JavaScript project"
+# Accept defaults
+
+# 3) Put files
+# - Save the Solidity file to: contracts/AadhaarVoting.sol
+# - Save the ABI file to: artifacts/AadhaarVoting.abi.json (or anywhere you prefer)
+
+# 4) Compile
+npx hardhat compile
