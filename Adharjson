@@ -1,0 +1,150 @@
+[
+  {
+    "inputs": [
+      { "internalType": "string[]", "name": "initialCandidates", "type": "string[]" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+  { "inputs": [], "name": "registrationOpen", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" },
+  { "inputs": [], "name": "votingOpen", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" },
+
+  {
+    "inputs": [{ "internalType": "bool", "name": "open", "type": "bool" }],
+    "name": "setRegistration",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bool", "name": "open", "type": "bool" }],
+    "name": "setVoting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+
+  {
+    "inputs": [{ "internalType": "string[]", "name": "names", "type": "string[]" }],
+    "name": "addCandidates",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "aadhaarHash", "type": "bytes32" }],
+    "name": "registerVoter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32[]", "name": "aadhaarHashes", "type": "bytes32[]" }],
+    "name": "bulkRegister",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "candidateIndex", "type": "uint256" },
+      { "internalType": "bytes32", "name": "aadhaarHash", "type": "bytes32" }
+    ],
+    "name": "castVote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+
+  {
+    "inputs": [],
+    "name": "totalCandidates",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
+    "name": "candidates",
+    "outputs": [
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "uint256", "name": "voteCount", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [],
+    "name": "getAllCandidates",
+    "outputs": [
+      { "internalType": "string[]", "name": "names", "type": "string[]" },
+      { "internalType": "uint256[]", "name": "voteCounts", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [],
+    "name": "winner",
+    "outputs": [
+      { "internalType": "uint256", "name": "index", "type": "uint256" },
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "uint256", "name": "voteCount", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "isRegistered",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "hasVoted",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  { "anonymous": false, "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "index", "type": "uint256" },
+      { "indexed": false, "internalType": "string", "name": "name", "type": "string" }
+    ],
+    "name": "CandidateAdded",
+    "type": "event"
+  },
+
+  { "anonymous": false, "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "aadhaarHash", "type": "bytes32" }
+    ],
+    "name": "VoterRegistered",
+    "type": "event"
+  },
+
+  { "anonymous": false, "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "aadhaarHash", "type": "bytes32" },
+      { "indexed": true, "internalType": "uint256", "name": "candidateIndex", "type": "uint256" }
+    ],
+    "name": "VoteCast",
+    "type": "event"
+  },
+
+  { "anonymous": false, "inputs": [
+      { "indexed": true, "internalType": "string", "name": "phase", "type": "string" },
+      { "indexed": false, "internalType": "bool", "name": "open", "type": "bool" }
+    ],
+    "name": "PhaseChanged",
+    "type": "event"
+  }
+]
